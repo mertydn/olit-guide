@@ -1,70 +1,124 @@
 # olit-guide
-Olit is an AI research assistant built directly into the Galaxy platform. It allows researchers to analyze data, run tools, build charts, and document experiments using plain language.
+
+Orbit Lite (Olit) is an AI research assistant built directly into the Galaxy platform. It allows researchers to analyze data, run tools, build charts, and document experiments using plain language.
 
 ---
 
-## 1. What Olit Does
-Galaxy contains hundreds of scientific tools and settings. Olit simplifies this experience:
-* You describe your analysis goal in ordinary words.
-* Olit identifies the appropriate tools and prepares their inputs.
-* Olit submits the jobs to Galaxy and tracks their progress.
-* Olit documents your entire workflow into a permanent scientific report.
+## 1. Orbit vs. Olit
+
+Galaxy provides two complementary AI assistants within its ecosystem:
+
+* **Orbit** lives in the Galaxy core, operating with full system-level access and broader backend capabilities.
+* **Olit** lives entirely in the browser, providing an instant assistant directly inside the web interface.
+
+Throughout this document, Orbit Lite is referred to simply as **Olit**.
 
 ---
 
-## 2. Where It Runs
-* **Directly in Your Web Browser:** Olit requires no software installation and no dedicated background servers. It opens as a side panel next to your active dataset.
-* **Uses Your Existing Login:** Because it runs in your current browser window, it works with your active Galaxy account automatically.
-* **Privacy by Default:** If you provide your own key for an external AI model, it stays inside your browser tab and is never stored on Galaxy servers.
-* **Preserved Conversations:** Your chat history is saved in your browser's local storage, meaning refreshing the page does not erase your work.
+## 2. Execution Environments
+Orbit and Olit use fundamentally different execution models:
+
+* **Orbit uses Linux and Bash:** It operates on a standard Linux environment with full command-line terminal access. It can install packages, run shell scripts, and execute tasks outside Galaxy.
+* **Olit uses Galaxy and Pyodide:** It has no operating system or terminal access. It interacts with data strictly through Galaxy APIs and runs Python in the browser via Pyodide.
+
+### Key Implications:
+1. **Olit Cannot Patch Missing Galaxy Features:** If a tool, dependency, or reference genome is missing on the Galaxy server, Olit cannot install it.
+2. **Highlighting Gaps in Galaxy:** Because Olit cannot work around missing capabilities using system commands, it directly exposes what Galaxy lacks. This makes Olit a valuable tool for uncovering Galaxy's gaps.
+3. **Pyodide Limitations:**
+   * **Lightweight Only:** Browser-based Python handles only basic data checks, column filtering, and quick math.
+   * **Browser Sandbox:** It has no access to local files and operates under standard browser security.
+   * **Heavy Science Stays in Galaxy:** All heavy computational workloads must run as real Galaxy tools, not in the browser.
 
 ---
 
-## 3. How It Works: Plan First, Run Second
-Olit is built on the principle that the researcher remains in full control:
-1. **Step-by-Step Plan:** When you request an analysis, Olit outlines a clear plan listing each tool and the settings it intends to use.
-2. **User Review:** You can inspect the proposal, request adjustments, or approve it.
-3. **Execution on Approval:** Olit only launches Galaxy jobs after you explicitly approve the plan.
-4. **Progress Tracking:** Olit monitors running jobs in the background and informs you when the results are ready.
+## 3. Resumability
+
+Because the browser owns the agent, Olit provides automatic session recovery across devices:
+
+```mermaid
+flowchart TD
+    A["Open Olit on a Galaxy history"]
+    B{"Conversation in this browser?"}
+    C["Restore full conversation"]
+    D["Start new conversation"]
+    E{"Existing notebook in Galaxy?"}
+    F["Use existing notebook"]
+    G["Create new notebook"]
+    H["Work with Olit"]
+    I{"Save conversation?"}
+    J["Saved conversation in Galaxy"]
+    K["Conversation remains in this browser"]
+    A --> B
+    B -->|Yes| C
+    B -->|No| D
+    D --> E
+    E -->|Yes| F
+    E -->|No| G
+    C --> H
+    F --> H
+    G --> H
+    H --> I
+    I -->|Yes| J
+    I -->|No| K
+    J -.->|"Open on any device"| C
+    K -.->|"Reopen in same browser"| C
+```
+
+* **Same Browser:** If you reopen the tab, the conversation history is immediately restored from local browser storage.
+* **Across Devices:** If you save the conversation, Galaxy stores it as a visualization object that can be reopened from any machine.
+* **Notebook Persistence:** Starting a new conversation automatically reconnects to an existing Galaxy notebook if one is already attached to that history.
 
 ---
 
-## 4. Key Capabilities
-* **Running Galaxy Tools:** Searches the platform, selects tools, and runs them on your datasets.
-* **Running Community Workflows:** Finds and executes peer-reviewed pipelines from the scientific community.
-* **Fast Local Math:** Performs lightweight calculations directly in your browser without waiting in server queues.
-* **Importing Public Data:** Looks up public sequence repositories by study number and downloads raw files straight into your history.
-* **Consulting Official Tutorials:** Searches official Galaxy training materials to follow verified scientific protocols.
-* **History Management:** Groups, renames, and tags datasets to keep large projects organized.
-* **Data Lineage:** Traces the history of any output file and displays its creation steps as an interactive flowchart.
+## 4. How It Works
+
+Olit ensures you retain full control over your analysis:
+
+1. **Step-by-Step Plan:** Olit proposes a concrete plan listing tools and parameters before executing anything.
+2. **User Review:** You can review, adjust, or approve the proposal.
+3. **Execution on Approval:** Galaxy tools are submitted only after explicit confirmation.
+4. **Progress Tracking:** Olit tracks job completion in the background and reports results.
 
 ---
 
-## 5. Visualizations and Charts
-* **Built-in Galaxy Viewers:** Opens dedicated platform viewers (such as genome browsers or 3D molecular viewers) with your data pre-loaded.
-* **Custom Charts on Demand:** Generates interactive bar charts, scatter plots, and heatmaps from tabular data directly in the side panel.
-* **Save or Preview:** Allows you to preview a chart temporarily or save it permanently as a shareable link in your Galaxy account.
-* **Scientific Integrity:** If a chart requires a new calculation, Olit runs a real Galaxy tool to produce the data first, ensuring all results remain reproducible.
+## 5. Key Capabilities
+
+* **Run Galaxy Tools:** Discovers installed tools, configures inputs, and executes jobs.
+* **Run Workflows:** Imports and runs verified community workflows.
+* **Import Public Data:** Downloads sequencing data from public archives like ENA by accession number.
+* **Consult Tutorials:** Reads Galaxy Training Network tutorials to follow verified scientific protocols.
+* **Organize Histories:** Groups, renames, and tags datasets.
 
 ---
 
-## 6. Built-in Guidebooks
-Instead of guessing platform rules, Olit consults official, built-in guidebooks:
-* **Specific Knowledge:** Individual guidebooks cover topics such as chart design, data structuring, and lab record keeping.
-* **Consulted on Demand:** Olit only loads a guidebook when a matching task begins.
-* **Verified Rules:** All guidebooks are verified and locked into the software package in advance to ensure consistent and reliable behavior.
+## 6. Visualizations and Charts
+
+* **Built-in Galaxy Viewers:** Opens dedicated Galaxy visualizers (such as genome browsers or molecular viewers) with pre-loaded data.
+* **Custom Charts:** Generates interactive bar charts, scatter plots, and heatmaps for tabular data directly in the side panel.
+* **Save vs. Preview:** Lets you preview charts temporarily or save them permanently to your Galaxy account.
 
 ---
 
-## 7. Automatic Lab Records
-Chat conversations can easily be closed or lost. To protect your work, Olit maintains a permanent Galaxy Page for every project:
+## 7. Built-in Skills
+
+Instead of guessing platform conventions, Olit references built-in skills:
+* **Specific Knowledge:** Covers chart configuration, collection management, and notebook formatting.
+* **Loaded on Demand:** Consulted only when a matching task begins.
+* **Fixed Rules:** Locked into the package in advance to guarantee predictable behavior.
+
+---
+
+## 8. Lab Records
+
+Chat conversations can easily be lost. Olit automatically maintains a permanent Galaxy Page for every project:
 * **The Plan:** Records the approved goals and parameters.
-* **The Execution:** Logs the exact tools used, marking each completed step with a checkmark.
-* **The Output:** Embeds generated charts and figures directly into the document alongside written interpretations.
-* **A Shareable Deliverable:** Leaves behind a complete, shareable, and verifiable scientific notebook at the end of every session.
+* **The Execution:** Logs the tools used, marking completed steps with checkmarks.
+* **The Output:** Embeds generated charts directly into the document.
+* **Durable Deliverable:** Leaves behind a complete and shareable scientific notebook at the end of every session.
 
 ---
 
-## 8. Safety and Governance
-* **Destructive Action Warnings:** If an operation would permanently delete data or cancel a workflow, Olit stops and asks for your confirmation first.
-* **No Fabricated Results:** Olit does not simulate data processing. All computations are performed by real Galaxy tools with full provenance tracking.
+## 9. Safety and Governance
+
+* **Destructive Action Warnings:** Prompts for explicit confirmation before deleting datasets or canceling workflows.
+* **Reproducible Computations:** Performs all scientific transformations through real Galaxy tools with full provenance tracking.
